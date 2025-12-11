@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Login - Opterea</title>
+  <link rel="stylesheet" href="style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    body {
+      background: linear-gradient(135deg, #2575fc, #6a11cb);
+      font-family: 'Poppins', sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      color: #fff;
+    }
+
+    .login-container {
+      background: #fff;
+      border-radius: 20px;
+      width: 400px;
+      max-width: 90%;
+      padding: 30px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+      text-align: center;
+      color: #1f2937;
+      animation: fadeInUp 1s ease;
+    }
+
+    h2 {
+      color: #2575fc;
+      margin-bottom: 25px;
+    }
+
+    form {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+
+    input {
+      padding: 12px 15px;
+      border-radius: 12px;
+      border: 1px solid #ddd;
+      font-size: 1rem;
+      transition: all 0.3s;
+    }
+
+    input:focus {
+      outline: none;
+      border-color: #2575fc;
+      box-shadow: 0 0 10px rgba(37,117,252,0.2);
+    }
+
+    button {
+      padding: 12px;
+      border-radius: 30px;
+      border: none;
+      background: linear-gradient(90deg, #ff9800, #ff5722);
+      color: #fff;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    button:hover {
+      transform: scale(1.05);
+      background: linear-gradient(90deg, #f57c00, #e64a19);
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    @keyframes fadeInUp {
+      0% { opacity: 0; transform: translateY(30px); }
+      100% { opacity: 1; transform: translateY(0); }
+    }
+
+    .login-footer {
+      margin-top: 10px;
+      font-size: 0.9rem;
+      color: #555;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="login-container">
+    <h2>Admin Login</h2>
+
+    <!-- Step 1: Username & Password -->
+    <form id="step1-form">
+      <input type="text" placeholder="Username" required>
+      <input type="password" placeholder="Password" required>
+      <button type="submit">Next</button>
+    </form>
+
+    <!-- Step 2: OTP / Security Code -->
+    <form id="step2-form" class="hidden">
+      <input type="text" placeholder="Security Code" required>
+      <button type="submit">Verify & Login</button>
+    </form>
+
+    <div class="login-footer">
+      Forgot password? <a href="#">Reset</a>
+    </div>
+  </div>
+
+  <script>
+    const step1Form = document.getElementById('step1-form');
+    const step2Form = document.getElementById('step2-form');
+
+    step1Form.addEventListener('submit', function(e) {
+      e.preventDefault();
+
+      // Normally here you'd check username & password from backend
+      // For demo, we move to step 2 directly
+      step1Form.classList.add('hidden');
+      step2Form.classList.remove('hidden');
+
+      alert('Step 1 successful! Enter OTP / Security Code.');
+    });
+
+    step2Form.addEventListener('submit', function(e) {
+      e.preventDefault();
+
+      // Normally here you'd verify OTP / Security Code from backend
+      // For demo, we just show success
+      alert('Admin logged in successfully!');
+      // Redirect to admin dashboard (example)
+      window.location.href = 'website-control-panel.html';
+    });
+  </script>
+
+</body>
+</html>
