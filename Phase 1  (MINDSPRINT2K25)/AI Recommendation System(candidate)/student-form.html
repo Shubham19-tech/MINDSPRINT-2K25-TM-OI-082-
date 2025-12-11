@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Student Registration & Preview</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(to right, #74ebd5, #ACB6E5);
+      margin: 0;
+      padding: 20px;
+    }
+    .container {
+      max-width: 800px;
+      margin: auto;
+      background: #fff;
+      padding: 25px;
+      border-radius: 15px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+    }
+    h2 { text-align:center; color:#333; margin-bottom:20px; }
+    label { display:block; margin-top:15px; font-weight:bold; color:#444; }
+    input, select, textarea {
+      width:100%; padding:10px; margin-top:6px; border:1px solid #ccc; border-radius:8px;
+    }
+    input:focus, select:focus, textarea:focus { border-color:#007bff; outline:none; }
+    button {
+      margin-top:20px; padding:12px 20px; border:none; border-radius:8px; background:#007bff;
+      color:white; cursor:pointer; font-size:16px;
+    }
+    button:hover { background:#0056b3; }
+    .lang-box, .project-box {
+      border:1px solid #ddd; padding:12px; margin-top:10px;
+      border-radius:10px; background:#f9f9f9;
+    }
+    #previewPage { display:none; }
+    .profile-preview { text-align:center; }
+    .profile-preview img {
+      width:120px; height:120px; border-radius:50%; object-fit:cover;
+      border:3px solid #007bff; margin-bottom:15px;
+    }
+    .profile-preview h3 { margin:10px 0; color:#333; }
+    .profile-preview p { margin:5px 0; color:#555; }
+    .profile-preview ul { text-align:left; margin-top:10px; }
+  </style>
+</head>
+<body>
+<div class="container" id="formPage">
+  <h2>Student Registration Form</h2>
+  <form id="regForm">
+    <label>Full Name:</label>
+    <input type="text" name="fullname" required>
+
+    <label>Phone Number:</label>
+    <input type="tel" name="phone" required>
+
+    <label>Gmail:</label>
+    <input type="email" name="gmail" required>
+
+    <label>Profile Picture:</label>
+    <input type="file" name="profilePic" accept="image/*" id="profilePic">
+
+    <label>College Name:</label>
+    <input type="text" name="collegeName" required>
+
+    <label>College City:</label>
+    <input type="text" name="collegeCity" required>
+
+    <label>Year:</label>
+    <select name="year">
+      <option>1st</option>
+      <option>2nd</option>
+      <option>3rd</option>
+      <option>4th</option>
+      <option>Passout</option>
+    </select>
+
+    <label>Branch:</label>
+    <select name="branch">
+      <option>CS</option>
+      <option>EC</option>
+      <option>AI</option>
+      <option>ML</option>
+      <option>DS</option>
+    </select>
+
+    <label>Last CGPA:</label>
+    <input type="number" step="0.01" name="cgpa">
+
+    <div id="languages">
+      <label>Computer Language Type:</label>
+      <select onchange="showLangOptions(this)" class="lang-type">
+        <option value="programming">Programming Language</option>
+        <option value="markup">Markup Language</option>
+        <option value="query">Query Language</option>
+        <option value="styling">Styling Language</option>
+      </select>
+      <div class="lang-box">
+        <select class="lang-options"></select>
+      </div>
+    </div>
+    <button type="button" onclick="addLanguage()">+ Add More Language</button>
+
+    <label>Custom Skill (max 100 words):</label>
+    <textarea maxlength="600" name="skills"></textarea>
+
+    <label>Internship Type:</label>
+    <select name="internship">
+      <option>Paid</option>
+      <option>Unpaid</option>
+      <option>Any</option>
+    </select>
+
+    <div id="projects">
+      <label>Projects:</label>
+      <button type="button" onclick="addProject()">+ Add Project</button>
+    </div>
+
+    <label>Username:</label>
+    <input type="text" name="username" required>
+
+    <label>Password:</label>
+    <input type="password" name="password" required>
+
+    <button type="button" onclick="goToPreview()">Preview</button>
+  </form>
+</div>
+
+<div class="container" id="previewPage">
+  <h2>Preview Page</h2>
+  <div id="preview" class="profile-preview"></div>
+  <button onclick="submitForm()">Submit</button>
+  <button onclick="backToForm()">Back to Edit</button>
+</div>
+
+<script>
+  const langOptions = {
+    programming: ["Python","Java","C++","JavaScript","Go","Rust"],
+    markup: ["HTML","XML","Markdown","LaTeX"],
+    query: ["SQL","GraphQL","SPARQL"],
+    styling: ["CSS","SCSS","LESS"]
+  };
+
+  function showLangOptions(select) {
+    const type = select.value;
+    const options = langOptions[type];
+    const dropdown = select.parentElement.querySelector(".lang-options");
+    dropdown.innerHTML = options.map(o => `<option>${o}</option>`).join("");
+  }
+
+  function addLanguage() {
+    const div = document.createElement("div");
+    div.innerHTML = `<label>Computer Language Type:</label>
+    <select onchange="showLangOptions(this)" class="lang-type">
+      <option value="programming">Programming Language</option>
+      <option value="markup">Markup Language</option>
+      <option value="query">Query Language</option>
+      <option value="styling">Styling Language</option>
+    </select>
+    <div class="lang-box"><select class="lang-options"></select></div>`;
+    document.getElementById("languages").appendChild(div);
+  }
+
+  function addProject() {
+    const div = document.createElement("div");
+    div.classList.add("project-box");
+    div.innerHTML = `<label>Project Title:</label>
+    <input type="text" name="projectTitle[]">
+    <label>Description:</label>
+    <textarea name="projectDesc[]"></textarea>`;
+    document.getElementById("projects").appendChild(div);
+  }
+
+  function goToPreview() {
+    const form = document.getElementById("regForm");
+    const data = new FormData(form);
+    const obj = {};
+    data.forEach((val,key)=> {
+      if(obj[key]){
+        if(!Array.isArray(obj[key])) obj[key]=[obj[key]];
+        obj[key].push(val);
+      } else obj[key]=val;
+    });
+
+    const file = document.getElementById("profilePic").files[0];
+    if(file){
+      const reader = new FileReader();
+      reader.onload = function(e){
+        obj["profilePicData"]=e.target.result;
+        showPreview(obj);
+      };
+      reader.readAsDataURL(file);
+    } else showPreview(obj);
+  }
+
+  function showPreview(data){
+    let html = "";
+    if(data.profilePicData) html += `<img src="${data.profilePicData}" alt="Profile Picture">`;
+    html += `<h3>${data.fullname}</h3>`;
+    html += `<p><b>Phone:</b> ${data.phone}</p>`;
+    html += `<p><b>Email:</b> ${data.gmail}</p>`;
+    html += `<p><b>College:</b> ${data.collegeName}, ${data.collegeCity}</p>`;
+    html += `<p><b>Year:</b> ${data.year}</p>`;
+    html += `<p><b>Branch:</b> ${data.branch}</p>`;
+    html += `<p><b>CGPA:</b> ${data.cgpa}</p>`;
+    html += `<p><b>Internship Type:</b> ${data.internship}</p>`;
+    html += `<p><b>Skills:</b> ${data.skills}</p>`;
+
+    if(data["projectTitle[]"]){
+      const titles = [].concat(data["projectTitle[]"]);
+      const descs = [].concat(data["projectDesc[]"]);
+      html += `<h4>Projects:</h4><ul>`;
+      titles.forEach((t,i)=> html += `<li><b>${t}</b>: ${descs[i]}</li>`);
+      html += `</ul>`;
+    }
+
+    document.getElementById("preview").innerHTML = html;
+    document.getElementById("formPage").style.display="none";
+    document.getElementById("previewPage").style.display="block";
+  }
+
+  function backToForm(){
+    document.getElementById("formPage").style.display="block";
+    document.getElementById("previewPage").style.display="none";
+  }
+
+  function submitForm(){
+    alert("Form submitted successfully ✅");
+    window.location.href="index.html";
+  }
+</script>
+
+<script>
+  // ---------- SUBMIT FORM TO BACKEND ----------
+function submitForm() {
+  const form = document.getElementById("regForm");
+  const data = new FormData(form);
+  const obj = {};
+
+  // Collect form fields
+  data.forEach((val, key) => {
+    if (obj[key]) {
+      if (!Array.isArray(obj[key])) obj[key] = [obj[key]];
+      obj[key].push(val);
+    } else {
+      obj[key] = val;
+    }
+  });
+
+  // Handle multiple projects
+  if (obj["projectTitle[]"]) {
+    const titles = [].concat(obj["projectTitle[]"]);
+    const descs = [].concat(obj["projectDesc[]"]);
+    obj["projects"] = titles.map((t, i) => `${t}: ${descs[i]}`);
+    delete obj["projectTitle[]"];
+    delete obj["projectDesc[]"];
+  }
+
+  // Convert profile picture to Base64 before sending
+  const file = document.getElementById("profilePic").files[0];
+  if (file) {
+    const reader = new FileReader();
+    reader.onload = function (e) {
+      obj["profilePicData"] = e.target.result; // Base64 string
+      sendData(obj);
+    };
+    reader.readAsDataURL(file);
+  } else {
+    sendData(obj);
+  }
+}
+
+// ---------- SEND DATA TO BACKEND ----------
+function sendData(obj) {
+  fetch("http://127.0.0.1:5000/students/register", {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify(obj),
+})
+    .then((res) => res.json())
+    .then((data) => {
+      if (data.error) throw new Error(data.error);
+      alert(data.message || "Student registered ✅");
+      window.location.href = "index.html"; // redirect after success
+    })
+    .catch((err) => {
+      console.error("Error:", err);
+      alert("Error submitting form ❌\n" + err.message);
+    });
+}
+
+</script>
+</body>
+</html>    

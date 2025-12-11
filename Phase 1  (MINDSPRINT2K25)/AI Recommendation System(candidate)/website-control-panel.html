@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Company Admin Panel</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  body { margin:0; font-family:'Poppins', sans-serif; background:#f0f2f5; }
+  .header { background:#1f3c88; color:white; padding:15px; text-align:center; font-size:22px; }
+  .sidebar { width:250px; background:#2c3e50; height:100vh; position:fixed; padding-top:20px; overflow-y:auto; }
+  .sidebar button { width:100%; padding:15px; border:none; background:none; text-align:left; font-size:16px; color:white; cursor:pointer; outline:none; }
+  .sidebar button:hover, .sidebar button.active { background:#1f3c88; }
+  .main { margin-left:250px; padding:20px; }
+  .container { background:white; padding:20px; border-radius:10px; box-shadow:0 4px 15px rgba(0,0,0,0.1); margin-bottom:20px; }
+  h3 { margin-top:0; color:#1f3c88; }
+  table { width:100%; border-collapse:collapse; margin-top:15px; }
+  th, td { border:1px solid #ccc; padding:10px; text-align:center; }
+  th { background:#1f3c88; color:white; }
+  .box-btn { padding:6px 12px; margin:2px; border:none; border-radius:6px; font-weight:600; cursor:pointer; }
+  .approve-btn { background:#28a745; color:white; } .approve-btn:hover{ background:#1f7a34; }
+  .reject-btn { background:#ff4d4d; color:white; } .reject-btn:hover{ background:#cc0000; }
+  .delete-btn { background:#888; color:white; } .delete-btn:hover{ background:#555; }
+  .clear-btn { background:#555; color:white; margin-bottom:10px; } .clear-btn:hover{ background:#333; }
+  .approved { background:#e6ffe6; }
+  .rejected { background:#ffe6e6; }
+  .details-box { border:1px solid #ccc; padding:15px; margin-bottom:10px; border-radius:6px; background:#f9f9f9; }
+</style>
+</head>
+<body>
+<div class="header">Company Admin Panel</div>
+
+<div class="sidebar">
+  <button class="active" onclick="showSection('companyRegistrations')">Company Registration</button>
+  <button onclick="showSection('companyDetails')">Company Registration Details</button>
+  <button onclick="showSection('registeredCompanies')">Registered Companies</button>
+  <button onclick="showSection('supportRequests')">Support Requests</button>
+  <button onclick="showSection('feedbackDetails')">Feedback Details</button>
+  <button onclick="showSection('blogApproval')">Blog Approval</button>
+  <button onclick="showSection('studentsList')">Registered Students List</button>
+</div>
+
+<div class="main">
+  <!-- 1. Company Registration -->
+  <div id="companyRegistrations" class="container">
+    <h3>Company Registrations</h3>
+    <button class="box-btn clear-btn" onclick="clearAllCompanies()">Clear All</button>
+    <table>
+      <thead>
+        <tr>
+          <th>Company Name</th>
+          <th>Industry</th>
+          <th>Email</th>
+          <th>Status</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody id="companyTable"></tbody>
+    </table>
+  </div>
+
+  <!-- 2. Company Registration Details -->
+  <div id="companyDetails" class="container" style="display:none">
+    <h3>Company Registration Details</h3>
+    <div id="detailsList"></div>
+  </div>
+
+  <!-- 3. Registered Companies -->
+  <div id="registeredCompanies" class="container" style="display:none">
+    <h3>Registered Companies (Approved)</h3>
+    <button class="box-btn clear-btn" onclick="clearApprovedCompanies()">Clear All</button>
+    <div id="registeredList"></div>
+  </div>
+
+  <!-- 4. Support Requests -->
+  <div id="supportRequests" class="container" style="display:none">
+    <h3>Support Requests</h3>
+    <button class="box-btn clear-btn" onclick="clearAllRequests()">Clear All</button>
+    <div id="requestList"></div>
+  </div>
+
+  <!-- 5. Feedback Details -->
+  <div id="feedbackDetails" class="container" style="display:none">
+    <h3>Feedback Details</h3>
+    <button class="box-btn clear-btn" onclick="clearAllFeedback()">Clear All</button>
+    <div id="feedbackList"></div>
+  </div>
+
+  <!-- 6. Blog Approval -->
+  <div id="blogApproval" class="container" style="display:none">
+    <h3>Blog Approval</h3>
+    <button class="box-btn clear-btn" onclick="clearAllBlogs()">Clear All</button>
+    <div id="blogList"></div>
+    <h3>Approved Blogs</h3>
+    <div id="approvedBlogs"></div>
+  </div>
+
+  <!-- 7. Registered Students List -->
+  <div id="studentsList" class="container" style="display:none">
+    <h3>Registered Students List</h3>
+    <table>
+      <thead>
+        <tr>
+          <th>Full Name</th>
+          <th>Email</th>
+          <th>College</th>
+          <th>Branch</th>
+          <th>Year</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody id="studentsTable"></tbody>
+    </table>
+  </div>
+</div>
+
+<script>
+// Sample Data
+let companies = [
+  {name:"TechSoft", industry:"IT", email:"hr@techsoft.com", hq:"Bangalore", founded:"2015", phone:"9876543210", desc:"Software development company.", status:"Pending"},
+  {name:"AgroFarm", industry:"Agriculture", email:"info@agrofarm.com", hq:"Delhi", founded:"2010", phone:"9123456780", desc:"Farming and agri solutions.", status:"Pending"}
+];
+
+let requests = [
+  "Need help with internship posting.",
+  "Unable to upload company document."
+];
+
+let feedbacks = [
+  "Great platform, very easy to use!",
+  "Please improve the resume upload section.",
+  "We need faster approval of internships."
+];
+
+let blogs = [
+  {title:"Future of AI in Hiring", author:"Alice", content:"AI will revolutionize HR systems.", status:"Pending"},
+  {title:"Sustainable Farming Practices", author:"Rahul", content:"AgroTech leads the future.", status:"Pending"}
+];
+
+let students = [
+  {name:"Shubh Yadav", email:"shubh@example.com", college:"XYZ College", branch:"CSE", year:"2"},
+  {name:"Amit Kumar", email:"amit@example.com", college:"ABC Institute", branch:"ECE", year:"3"}
+];
+
+// --- Navigation ---
+function showSection(section){
+  document.querySelectorAll('.main > div').forEach(div=>div.style.display='none');
+  document.getElementById(section).style.display='block';
+  document.querySelectorAll('.sidebar button').forEach(btn=>btn.classList.remove('active'));
+  event.target.classList.add('active');
+
+  if(section==='companyRegistrations') renderCompanies();
+  if(section==='companyDetails') renderDetails();
+  if(section==='registeredCompanies') renderRegistered();
+  if(section==='supportRequests') renderRequests();
+  if(section==='feedbackDetails') renderFeedbacks();
+  if(section==='blogApproval') renderBlogs();
+  if(section==='studentsList') renderStudents();
+}
+
+// --- Companies ---
+function renderCompanies(){
+  const tbody=document.getElementById('companyTable');
+  tbody.innerHTML='';
+  companies.forEach((c,i)=>{
+    const tr=document.createElement('tr');
+    tr.className=c.status==="Approved"?"approved":c.status==="Rejected"?"rejected":"";
+    tr.innerHTML=`
+      <td>${c.name}</td>
+      <td>${c.industry}</td>
+      <td>${c.email}</td>
+      <td>${c.status}</td>
+      <td>
+        <button class="box-btn approve-btn" onclick="approveCompany(${i})">Approve</button>
+        <button class="box-btn reject-btn" onclick="rejectCompany(${i})">Reject</button>
+        <button class="box-btn delete-btn" onclick="deleteCompany(${i})">Delete</button>
+      </td>`;
+    tbody.appendChild(tr);
+  });
+}
+function approveCompany(i){ companies[i].status="Approved"; renderCompanies(); }
+function rejectCompany(i){ companies[i].status="Rejected"; renderCompanies(); }
+function deleteCompany(i){ companies.splice(i,1); renderCompanies(); renderDetails(); renderRegistered(); }
+function clearAllCompanies(){ companies=[]; renderCompanies(); renderDetails(); renderRegistered(); }
+
+// --- Company Details ---
+function renderDetails(){
+  const div=document.getElementById('detailsList');
+  div.innerHTML='';
+  companies.forEach((c,i)=>{
+    const box=document.createElement('div');
+    box.className="details-box";
+    box.innerHTML=`
+      <strong>${c.name}</strong><br>
+      Industry: ${c.industry}<br>
+      Email: ${c.email}<br>
+      Headquarters: ${c.hq}<br>
+      Founded: ${c.founded}<br>
+      Phone: ${c.phone}<br>
+      Description: ${c.desc}<br>
+      Status: <b>${c.status}</b><br>
+      <button class="box-btn delete-btn" onclick="deleteCompany(${i})">Delete</button>`;
+    div.appendChild(box);
+  });
+}
+
+// --- Registered Companies ---
+function renderRegistered(){
+  const div=document.getElementById('registeredList');
+  div.innerHTML='';
+  let approved=companies.filter(c=>c.status==="Approved");
+  if(approved.length===0){ div.innerHTML="<p>No registered companies yet.</p>"; return; }
+  approved.forEach((c,i)=>{
+    const box=document.createElement('div');
+    box.className="details-box";
+    box.innerHTML=`<strong>${c.name}</strong> (${c.industry})<br>Email: ${c.email}<br>HQ: ${c.hq}<br>
+      <button class="box-btn delete-btn" onclick="deleteApproved(${i})">Delete</button>`;
+    div.appendChild(box);
+  });
+}
+function deleteApproved(i){
+  let approved=companies.filter(c=>c.status==="Approved");
+  let idx=companies.indexOf(approved[i]);
+  if(idx>-1){ companies.splice(idx,1); renderRegistered(); renderDetails(); renderCompanies(); }
+}
+function clearApprovedCompanies(){
+  companies = companies.filter(c=>c.status!=="Approved");
+  renderRegistered(); renderDetails(); renderCompanies();
+}
+
+// --- Support Requests ---
+function renderRequests(){
+  const div=document.getElementById('requestList');
+  div.innerHTML='';
+  requests.forEach((r,i)=>{
+    const item=document.createElement('div');
+    item.style.padding="10px"; item.style.borderBottom="1px solid #ddd";
+    item.innerHTML=`${r} <button class="box-btn delete-btn" onclick="deleteRequest(${i})">Delete</button>`;
+    div.appendChild(item);
+  });
+}
+function deleteRequest(i){ requests.splice(i,1); renderRequests(); }
+function clearAllRequests(){ requests=[]; renderRequests(); }
+
+// --- Feedbacks ---
+function renderFeedbacks(){
+  const div=document.getElementById('feedbackList');
+  div.innerHTML='';
+  feedbacks.forEach((f,i)=>{
+    const item=document.createElement('div');
+    item.className="details-box";
+    item.innerHTML=`${f} <br><button class="box-btn delete-btn" onclick="deleteFeedback(${i})">Delete</button>`;
+    div.appendChild(item);
+  });
+}
+function deleteFeedback(i){ feedbacks.splice(i,1); renderFeedbacks(); }
+function clearAllFeedback(){ feedbacks=[]; renderFeedbacks(); }
+
+// --- Blogs ---
+function renderBlogs(){
+  const div=document.getElementById('blogList');
+  div.innerHTML='';
+  blogs.forEach((b,i)=>{
+    const box=document.createElement('div');
+    box.className="details-box";
+    box.innerHTML=`
+      <b>${b.title}</b> by ${b.author}<br>
+      ${b.content}<br>
+      Status: ${b.status}<br>
+      <button class="box-btn approve-btn" onclick="approveBlog(${i})">Approve</button>
+      <button class="box-btn reject-btn" onclick="rejectBlog(${i})">Reject</button>
+      <button class="box-btn delete-btn" onclick="deleteBlog(${i})">Delete</button>`;
+    div.appendChild(box);
+  });
+  renderApprovedBlogs();
+}
+function approveBlog(i){ blogs[i].status="Approved"; renderBlogs(); }
+function rejectBlog(i){ blogs[i].status="Rejected"; renderBlogs(); }
+function deleteBlog(i){ blogs.splice(i,1); renderBlogs(); }
+function clearAllBlogs(){ blogs=[]; renderBlogs(); }
+function renderApprovedBlogs(){
+  const div=document.getElementById('approvedBlogs');
+  div.innerHTML='';
+  blogs.filter(b=>b.status==="Approved").forEach(b=>{
+    const box=document.createElement('div');
+    box.className="details-box";
+    box.innerHTML=`<b>${b.title}</b> by ${b.author}<br>${b.content}`;
+    div.appendChild(box);
+  });
+}
+
+// --- Students ---
+function renderStudents(){
+  const tbody=document.getElementById('studentsTable');
+  tbody.innerHTML='';
+  students.forEach((s,i)=>{
+    const tr=document.createElement('tr');
+    tr.innerHTML=`<td>${s.name}</td><td>${s.email}</td><td>${s.college}</td><td>${s.branch}</td><td>${s.year}</td>
+      <td><button class="box-btn delete-btn" onclick="deleteStudent(${i})">Delete</button></td>`;
+    tbody.appendChild(tr);
+  });
+}
+function deleteStudent(i){ students.splice(i,1); renderStudents(); }
+
+// Initial Load
+renderCompanies();
+</script>
+
+<script>
+// --- API URLs ---
+const BASE_URL = "http://127.0.0.1:5000"; // change if your Flask runs elsewhere
+
+// --- Navigation ---
+function showSection(section){
+  document.querySelectorAll('.main > div').forEach(div=>div.style.display='none');
+  document.getElementById(section).style.display='block';
+  document.querySelectorAll('.sidebar button').forEach(btn=>btn.classList.remove('active'));
+  event.target.classList.add('active');
+
+  if(section==='companyRegistrations') renderCompanies();
+  if(section==='companyDetails') renderDetails();
+  if(section==='registeredCompanies') renderRegistered();
+  if(section==='studentsList') renderStudents();
+}
+
+// --- Companies ---
+async function fetchPendingCompanies(){
+  try {
+    const res = await fetch(`${BASE_URL}/companies/pending`);
+    return await res.json();
+  } catch(e){ console.error(e); return []; }
+}
+
+async function fetchApprovedCompanies(){
+  try {
+    const res = await fetch(`${BASE_URL}/companies/approved`);
+    return await res.json();
+  } catch(e){ console.error(e); return []; }
+}
+
+async function renderCompanies(){
+  const tbody = document.getElementById('companyTable');
+  tbody.innerHTML = '';
+  const companies = await fetchPendingCompanies();
+  companies.forEach((c, i) => {
+    const tr = document.createElement('tr');
+    tr.className = c.status==="Approved"?"approved":c.status==="Rejected"?"rejected":"";
+    tr.innerHTML = `
+      <td>${c.companyName}</td>
+      <td>${c.industry}</td>
+      <td>${c.email}</td>
+      <td>${c.status}</td>
+      <td>
+        <button class="box-btn approve-btn" onclick="approveCompany(${i})">Approve</button>
+        <button class="box-btn reject-btn" onclick="rejectCompany(${i})">Reject</button>
+        <button class="box-btn delete-btn" onclick="deleteCompany(${i})">Delete</button>
+      </td>`;
+    tbody.appendChild(tr);
+  });
+}
+
+async function approveCompany(index){
+  await fetch(`${BASE_URL}/companies/approve/${index}`, { method: "POST" });
+  renderCompanies();
+  renderRegistered();
+  renderDetails();
+}
+
+async function rejectCompany(index){
+  await fetch(`${BASE_URL}/companies/reject/${index}`, { method: "POST" });
+  renderCompanies();
+  renderDetails();
+}
+
+async function deleteCompany(index){
+  await fetch(`${BASE_URL}/companies/delete/${index}`, { method: "DELETE" });
+  renderCompanies();
+  renderDetails();
+  renderRegistered();
+}
+
+async function clearAllCompanies(){
+  await fetch(`${BASE_URL}/companies/clear`, { method: "DELETE" });
+  renderCompanies();
+  renderDetails();
+  renderRegistered();
+}
+
+// --- Company Details ---
+async function renderDetails(){
+  const div = document.getElementById('detailsList');
+  div.innerHTML = '';
+  const companies = await fetchPendingCompanies();
+  companies.forEach((c, i) => {
+    const box = document.createElement('div');
+    box.className="details-box";
+    box.innerHTML=`
+      <strong>${c.companyName}</strong><br>
+      Industry: ${c.industry}<br>
+      Email: ${c.email}<br>
+      Headquarters: ${c.headquarter}<br>
+      Founded: ${c.foundedYear}<br>
+      Phone: ${c.phone}<br>
+      Description: ${c.description}<br>
+      Status: <b>${c.status}</b><br>
+      <button class="box-btn delete-btn" onclick="deleteCompany(${i})">Delete</button>`;
+    div.appendChild(box);
+  });
+}
+
+// --- Registered Companies ---
+async function renderRegistered(){
+  const div = document.getElementById('registeredList');
+  div.innerHTML = '';
+  const companies = await fetchApprovedCompanies();
+  if(companies.length===0){ div.innerHTML="<p>No registered companies yet.</p>"; return; }
+  companies.forEach((c,i)=>{
+    const box=document.createElement('div');
+    box.className="details-box";
+    box.innerHTML=`<strong>${c.companyName}</strong> (${c.industry})<br>Email: ${c.email}<br>HQ: ${c.headquarter}<br>
+      <button class="box-btn delete-btn" onclick="deleteApproved(${i})">Delete</button>`;
+    div.appendChild(box);
+  });
+}
+
+async function deleteApproved(i){
+  const companies = await fetchApprovedCompanies();
+  const company = companies[i];
+  await fetch(`${BASE_URL}/companies/delete-approved/${i}`, { method: "DELETE" });
+  renderRegistered();
+  renderCompanies();
+  renderDetails();
+}
+
+async function clearApprovedCompanies(){
+  await fetch(`${BASE_URL}/companies/clear-approved`, { method: "DELETE" });
+  renderRegistered();
+  renderCompanies();
+  renderDetails();
+}
+
+// --- Students ---
+async function fetchStudents(){
+  try {
+    const res = await fetch(`${BASE_URL}/students`);
+    return await res.json();
+  } catch(e){ console.error(e); return []; }
+}
+
+async function renderStudents(){
+  const tbody=document.getElementById('studentsTable');
+  tbody.innerHTML='';
+  const students = await fetchStudents();
+  students.forEach((s,i)=>{
+    const tr=document.createElement('tr');
+    tr.innerHTML=`<td>${s.fullname}</td><td>${s.gmail}</td><td>${s.collegeName}</td><td>${s.branch}</td><td>${s.year}</td>
+      <td><button class="box-btn delete-btn" onclick="deleteStudent(${i})">Delete</button></td>`;
+    tbody.appendChild(tr);
+  });
+}
+
+async function deleteStudent(i){
+  await fetch(`${BASE_URL}/students/delete/${i}`, { method: "DELETE" });
+  renderStudents();
+}
+
+// --- Initial Load ---
+renderCompanies();
+renderRegistered();
+renderStudents();
+</script>
+
+</body>
+</html>

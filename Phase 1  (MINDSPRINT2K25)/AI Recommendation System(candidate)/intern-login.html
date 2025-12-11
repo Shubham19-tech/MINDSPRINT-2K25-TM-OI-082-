@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Intern Login - Opterea</title>
+  <link rel="stylesheet" href="style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    body {
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      font-family: 'Poppins', sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      color: #1f2937;
+    }
+
+    .login-container {
+      background: #fff;
+      border-radius: 20px;
+      width: 350px;
+      max-width: 90%;
+      padding: 30px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+      text-align: center;
+      animation: fadeInUp 1s ease;
+    }
+
+    h2 {
+      color: #2575fc;
+      margin-bottom: 25px;
+    }
+
+    form {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+
+    input {
+      padding: 12px 15px;
+      border-radius: 12px;
+      border: 1px solid #ddd;
+      font-size: 1rem;
+      transition: all 0.3s;
+    }
+
+    input:focus {
+      outline: none;
+      border-color: #2575fc;
+      box-shadow: 0 0 10px rgba(37,117,252,0.2);
+    }
+
+    button {
+      padding: 12px;
+      border-radius: 30px;
+      border: none;
+      background: linear-gradient(90deg, #ff9800, #ff5722);
+      color: #fff;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    button:hover {
+      transform: scale(1.05);
+      background: linear-gradient(90deg, #f57c00, #e64a19);
+    }
+
+    .login-footer {
+      margin-top: 10px;
+      font-size: 0.9rem;
+      color: #555;
+    }
+
+    .login-footer a {
+      color: #2575fc;
+      font-weight: 600;
+      text-decoration: none;
+    }
+
+    .login-footer a:hover {
+      text-decoration: underline;
+    }
+
+    @keyframes fadeInUp {
+      0% { opacity: 0; transform: translateY(30px); }
+      100% { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="login-container">
+    <h2>Intern / Employee Login</h2>
+    <form onsubmit="handleLogin(event)">
+  <input type="text" placeholder="Username" required>
+  <input type="password" placeholder="Password" required>
+  <button type="submit">Login</button>
+  <div class="login-footer">
+    Don't have an account? <a href="student-form.html">Register Here</a>
+  </div>
+</form>
+
+<script>
+  function handleLogin(e) {
+    e.preventDefault(); // Stop normal form submit
+    // Later you can add validation with backend
+    window.location.href = "intern-panel.html"; // redirect to intern/employee panel
+  }
+</script>
+
+  </div>
+
+</body>
+</html>

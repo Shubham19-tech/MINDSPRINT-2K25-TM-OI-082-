@@ -1,0 +1,675 @@
+/* =========================
+   Global Styles
+========================= */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Poppins', sans-serif;
+}
+
+body {
+  background: #f9f9f9;
+  color: #1f2937;
+  line-height: 1.6;
+  overflow-x: hidden;
+}
+
+/* =========================
+   Header
+========================= */
+header {
+  position: fixed;
+  top: 0;
+  width: 100%;
+  padding: 20px 60px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: linear-gradient(90deg, #6a11cb, #2575fc);
+  color: #fff;
+  z-index: 1000;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+}
+
+.logo {
+  font-size: 1.8rem;
+  font-weight: 700;
+  letter-spacing: 2px;
+}
+
+nav ul {
+  list-style: none;
+  display: flex;
+  gap: 25px;
+}
+
+nav ul li a {
+  text-decoration: none;
+  color: #fff;
+  font-weight: 500;
+  transition: 0.3s;
+}
+
+nav ul li a:hover {
+  color: #ffe082;
+  transform: scale(1.1);
+}
+
+/* Login Box Container */
+.login-box {
+  display: flex;
+  gap: 15px;
+}
+
+/* Common Login Button Styles */
+.login-btn {
+  padding: 8px 18px;
+  border-radius: 8px;
+  text-decoration: none;
+  font-weight: 600;
+  transition: 0.3s;
+  border: 2px solid #fff;
+  font-size: 0.9rem;
+}
+
+/* Intern Login Style */
+.login-btn.intern {
+  background: #ff9800;
+  color: #fff;
+  border: none;
+}
+
+.login-btn.intern:hover {
+  background: #f57c00;
+  transform: scale(1.05);
+}
+
+/* Company Login Style */
+.login-btn.company {
+  background: #ffffff;
+  color: #2575fc;
+}
+
+.login-btn.company:hover {
+  background: #e3f2fd;
+  transform: scale(1.05);
+}
+
+
+/* =========================
+   Hero Section
+========================= */
+.hero {
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  color: #fff;
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  position: relative;
+  overflow: hidden;
+  padding: 0 20px;
+}
+
+/* Ensure text stays centered */
+.hero-content {
+  position: relative;
+  z-index: 2; /* keep text above background shapes */
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.hero h1 {
+  font-size: 3rem;
+  margin-bottom: 15px;
+  animation: fadeInUp 2s ease;
+}
+
+.hero p {
+  font-size: 1.2rem;
+  margin-bottom: 25px;
+  animation: fadeInUp 2.5s ease;
+}
+
+.hero-buttons {
+  display: flex;
+  gap: 20px;
+  justify-content: center;
+  animation: fadeInUp 3s ease;
+}
+
+
+/* Moving Background Shapes */
+.hero::before, .hero::after {
+  content: "";
+  position: absolute;
+  border-radius: 50%;
+  opacity: 0.3;
+  animation: float 8s ease-in-out infinite;
+}
+
+.hero::before {
+  width: 400px;
+  height: 400px;
+  background: #ff6f61;
+  top: -100px;
+  left: -150px;
+}
+
+.hero::after {
+  width: 500px;
+  height: 500px;
+  background: #42a5f5;
+  bottom: -150px;
+  right: -200px;
+}
+
+.hero h1 {
+  font-size: 3rem;
+  margin-bottom: 15px;
+  animation: fadeInUp 2s ease;
+}
+
+.hero p {
+  font-size: 1.2rem;
+  margin-bottom: 25px;
+  animation: fadeInUp 2.5s ease;
+}
+
+.hero-buttons {
+  display: flex;
+  gap: 20px;
+  justify-content: center;
+  animation: fadeInUp 3s ease;
+}
+
+.btn-primary, .btn-secondary {
+  padding: 12px 24px;
+  border-radius: 30px;
+  text-decoration: none;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+.btn-primary {
+  background: #ff9800;
+  color: #fff;
+}
+
+.btn-primary:hover {
+  background: #f57c00;
+  transform: scale(1.1);
+}
+
+.btn-secondary {
+  background: #fff;
+  color: #2575fc;
+}
+
+.btn-secondary:hover {
+  background: #e3f2fd;
+  transform: scale(1.1);
+}
+
+/* =========================
+   Stats Section
+========================= */
+.stats {
+  display: flex;
+  justify-content: center;
+  gap: 50px;
+  padding: 60px 20px;
+  background: #f1f8ff;
+}
+
+.stat-card {
+  text-align: center;
+  background: #fff;
+  padding: 30px;
+  border-radius: 20px;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+  transition: transform 0.3s;
+}
+
+.stat-card:hover {
+  transform: translateY(-10px);
+}
+
+.stat-card h2 {
+  font-size: 2.5rem;
+  color: #2575fc;
+}
+
+/* =========================
+   Featured Companies
+========================= */
+.featured-companies {
+  padding: 60px 20px;
+  text-align: center;
+}
+
+.company-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 30px;
+  margin-top: 30px;
+}
+
+.company-card {
+  background: #fff;
+  border-radius: 15px;
+  padding: 20px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  transition: transform 0.3s;
+}
+
+.company-card:hover {
+  transform: scale(1.05);
+}
+
+.company-card img {
+  width: 100px;
+  margin-bottom: 15px;
+}
+
+/* =========================
+   Trending Internships
+========================= */
+.trending {
+  background: #f9f9f9;
+  padding: 60px 20px;
+  text-align: center;
+}
+
+.trending-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 20px;
+  margin-top: 30px;
+}
+
+.trending-card {
+  background: linear-gradient(135deg, #6a11cb, #2575fc);
+  color: #fff;
+  padding: 25px;
+  border-radius: 15px;
+  transition: transform 0.3s;
+}
+
+.trending-card:hover {
+  transform: translateY(-10px);
+}
+
+/* =========================
+   Categories
+========================= */
+.categories {
+  padding: 60px 20px;
+  text-align: center;
+}
+
+.category-cards {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 15px;
+  margin-top: 30px;
+}
+
+.category-card {
+  background: #ff9800;
+  color: #fff;
+  padding: 12px 25px;
+  border-radius: 30px;
+  font-weight: 600;
+  transition: 0.3s;
+}
+
+.category-card:hover {
+  background: #f57c00;
+  transform: scale(1.1);
+}
+
+/* =========================
+   How It Works
+========================= */
+.how-it-works {
+  padding: 60px 20px;
+  text-align: center;
+  background: #e3f2fd;
+}
+
+.steps {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 30px;
+  margin-top: 30px;
+}
+
+.step {
+  background: #fff;
+  padding: 20px;
+  border-radius: 15px;
+  width: 280px;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+  transition: transform 0.3s;
+}
+
+.step:hover {
+  transform: scale(1.05);
+}
+
+/* =========================
+   Newsletter
+========================= */
+.newsletter {
+  text-align: center;
+  padding: 60px 20px;
+  background: linear-gradient(90deg, #2575fc, #6a11cb);
+  color: #fff;
+}
+
+.newsletter form {
+  margin-top: 20px;
+}
+
+.newsletter input {
+  padding: 12px 20px;
+  border-radius: 30px;
+  border: none;
+  width: 250px;
+}
+
+.newsletter button {
+  padding: 12px 25px;
+  border-radius: 30px;
+  border: none;
+  margin-left: 10px;
+  background: #ff9800;
+  color: #fff;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.newsletter button:hover {
+  background: #f57c00;
+}
+
+/* =========================
+   Testimonials
+========================= */
+.testimonials {
+  padding: 60px 20px;
+  text-align: center;
+}
+
+.testimonial-cards {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 20px;
+  margin-top: 30px;
+}
+
+.testimonial-card {
+  background: #fff;
+  padding: 25px;
+  border-radius: 15px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  max-width: 300px;
+  transition: transform 0.3s;
+}
+
+.testimonial-card:hover {
+  transform: translateY(-10px);
+}
+
+/* =========================
+   Footer
+========================= */
+footer {
+  background: #1f2937;
+  color: #fff;
+  text-align: center;
+  padding: 25px 20px;
+}
+
+.social-links {
+  margin-top: 15px;
+}
+
+.social-links a {
+  margin: 0 10px;
+  text-decoration: none;
+  color: #ff9800;
+  font-weight: 600;
+  transition: 0.3s;
+}
+
+.social-links a:hover {
+  color: #ffe082;
+}
+
+/* =========================
+   Animations
+========================= */
+@keyframes float {
+  0% { transform: translateY(0px); }
+  50% { transform: translateY(-20px); }
+  100% { transform: translateY(0px); }
+}
+
+@keyframes fadeInUp {
+  0% { opacity: 0; transform: translateY(40px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+/* Initial hidden state */
+.stat-card,
+.company-card,
+.trending-card,
+.category-card,
+.step,
+.testimonial-card {
+  opacity: 0;
+  transform: translateY(30px);
+}
+
+/* Activated on scroll */
+.fade-in {
+  opacity: 1 !important;
+  transform: translateY(0) !important;
+  transition: all 0.8s ease-in-out;
+}
+
+/* Blog Page Styles */
+body {
+  background: #f9f9f9;
+  color: #1f2937;
+  font-family: 'Poppins', sans-serif;
+  line-height: 1.6;
+}
+
+/* Hero Section */
+.hero {
+  background: linear-gradient(135deg, #6a11cb, #2575fc);
+  color: #fff;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 20px;
+  position: relative;
+}
+
+.hero h1 {
+  font-size: 2.8rem;
+  margin-bottom: 15px;
+  animation: fadeInDown 1.5s ease;
+}
+
+.hero p {
+  font-size: 1.2rem;
+  opacity: 0.9;
+  animation: fadeInUp 2s ease;
+}
+
+/* Blog Articles */
+.featured-companies {
+  padding: 60px 20px;
+  background: #fff;
+}
+
+.featured-companies h2 {
+  font-size: 2rem;
+  color: #2575fc;
+  margin-bottom: 40px;
+  text-align: center;
+}
+
+.company-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 25px;
+}
+
+.company-card {
+  background: linear-gradient(135deg, #ffe082, #ff9800);
+  padding: 25px;
+  border-radius: 15px;
+  box-shadow: 0 6px 15px rgba(0,0,0,0.1);
+  transition: transform 0.3s, box-shadow 0.3s;
+  color: #1f2937;
+}
+
+.company-card:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+}
+
+.company-card h3 {
+  font-size: 1.4rem;
+  margin-bottom: 10px;
+}
+
+.company-card a {
+  display: inline-block;
+  margin-top: 12px;
+  text-decoration: none;
+  font-weight: 600;
+  color: #2575fc;
+  transition: color 0.3s;
+}
+
+.company-card a:hover {
+  color: #6a11cb;
+}
+
+/* Animations */
+@keyframes fadeInDown {
+  0% { opacity: 0; transform: translateY(-30px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeInUp {
+  0% { opacity: 0; transform: translateY(30px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+/* Feedback Page Styles */
+body {
+  background: #f1f8ff;
+  color: #1f2937;
+  font-family: 'Poppins', sans-serif;
+  line-height: 1.6;
+}
+
+/* Hero Section */
+.hero {
+  background: linear-gradient(90deg, #2575fc, #6a11cb);
+  color: #fff;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 20px;
+}
+
+.hero h1 {
+  font-size: 2.8rem;
+  margin-bottom: 15px;
+  animation: zoomIn 1.5s ease;
+}
+
+.hero p {
+  font-size: 1.2rem;
+  opacity: 0.9;
+  animation: fadeIn 2s ease;
+}
+
+/* Feedback Form */
+.newsletter {
+  background: #fff;
+  padding: 60px 20px;
+  text-align: center;
+}
+
+.newsletter h2 {
+  font-size: 2rem;
+  color: #2575fc;
+  margin-bottom: 25px;
+}
+
+.newsletter input,
+.newsletter textarea {
+  width: 320px;
+  max-width: 90%;
+  margin: 10px auto;
+  display: block;
+  padding: 12px 18px;
+  border: 2px solid #ddd;
+  border-radius: 12px;
+  font-size: 1rem;
+  transition: border 0.3s, box-shadow 0.3s;
+}
+
+.newsletter input:focus,
+.newsletter textarea:focus {
+  border-color: #2575fc;
+  box-shadow: 0 0 10px rgba(37,117,252,0.2);
+  outline: none;
+}
+
+.newsletter button {
+  background: linear-gradient(90deg, #ff9800, #ff5722);
+  color: #fff;
+  padding: 12px 30px;
+  border-radius: 30px;
+  border: none;
+  margin-top: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.3s, background 0.3s;
+}
+
+.newsletter button:hover {
+  transform: scale(1.05);
+  background: linear-gradient(90deg, #f57c00, #e64a19);
+}
+
+/* Animations */
+@keyframes zoomIn {
+  0% { transform: scale(0.8); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+@keyframes fadeIn {
+  0% { opacity: 0; }
+  100% { opacity: 1; }
+}
+
+
