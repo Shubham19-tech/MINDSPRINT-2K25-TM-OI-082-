@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Company Admin Panel</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  body { margin:0; font-family:'Poppins', sans-serif; background:#f0f2f5; }
+  .header { background:#1f3c88; color:white; padding:15px; text-align:center; font-size:22px; position:relative; }
+  .logout-btn { position:absolute; right:20px; top:15px; background:#ff4d4d; border:none; padding:8px 15px; color:white; font-weight:600; cursor:pointer; border-radius:8px; }
+  .logout-btn:hover{ background:#cc0000; }
+  .sidebar { width:250px; background:#2c3e50; height:100vh; position:fixed; padding-top:20px; box-shadow:2px 0 5px rgba(0,0,0,0.1); }
+  .sidebar button { width:100%; padding:15px; border:none; background:none; text-align:left; font-size:16px; color:white; cursor:pointer; outline:none; font-weight:500; }
+  .sidebar button:hover, .sidebar button.active { background:#1f3c88; }
+  .main { margin-left:250px; padding:20px; }
+  .container { background:white; padding:20px; border-radius:10px; box-shadow:0 4px 15px rgba(0,0,0,0.1); margin-bottom:20px; }
+  h3 { margin-top:0; color:#1f3c88; }
+  label { display:block; margin-top:10px; font-weight:600; }
+  input, select, textarea { width:100%; padding:10px; margin-top:5px; border:1px solid #ccc; border-radius:8px; }
+  button.submit-btn { background:#1f3c88; color:white; border:none; padding:10px 20px; margin-top:15px; cursor:pointer; border-radius:8px; font-weight:600; }
+  button.submit-btn:hover { background:#162f6b; }
+  .box-btn { display:inline-block; margin:5px; padding:8px 15px; border-radius:8px; border:none; cursor:pointer; font-weight:600; }
+  .pause-btn { background:#ffa500; color:white; } .pause-btn:hover{ background:#cc8400; }
+  .delete-btn { background:#ff4d4d; color:white; } .delete-btn:hover{ background:#cc0000; }
+  .clear-btn { background:#888; color:white; } .clear-btn:hover{ background:#555; }
+  .preview-box { background:#e6f0ff; padding:15px; border-radius:8px; margin-top:15px; }
+  table { width:100%; border-collapse:collapse; margin-top:15px; }
+  th, td { border:1px solid #ccc; padding:10px; text-align:center; }
+  th { background:#1f3c88; color:white; }
+</style>
+</head>
+<body>
+<div class="header">
+  Company Admin Panel
+  <button class="logout-btn" onclick="logout()">Logout</button>
+</div>
+
+<div class="sidebar">
+  <button class="active" onclick="showSection('submittedForms')">Submitted Forms</button>
+  <button onclick="showSection('notifications')">Notifications</button>
+  <button onclick="showSection('employeeDetails')">Employee Details / CV</button>
+  <button onclick="showSection('requirementForm')">Requirement Form</button>
+</div>
+
+<div class="main">
+  <!-- 1. Submitted Forms -->
+  <div id="submittedForms" class="container">
+    <h3>Submitted Forms per Internship</h3>
+    <button class="box-btn clear-btn" onclick="clearAllInternships()">Clear All</button>
+    <table>
+      <thead>
+        <tr>
+          <th>Internship Title</th>
+          <th>Submitted Count</th>
+          <th>Status</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody id="internshipTable"></tbody>
+    </table>
+  </div>
+
+  <!-- 2. Notifications -->
+  <div id="notifications" class="container" style="display:none">
+    <h3>Notifications</h3>
+    <button class="box-btn clear-btn" onclick="clearAllNotifications()">Clear All</button>
+    <div id="notificationList"></div>
+  </div>
+
+  <!-- 3. Employee Details / CV -->
+  <div id="employeeDetails" class="container" style="display:none">
+    <h3>Employee Submissions / CV</h3>
+    <button class="box-btn clear-btn" onclick="clearAllEmployees()">Clear All</button>
+    <div id="employeeList"></div>
+  </div>
+
+  <!-- 4. Requirement Form -->
+  <div id="requirementForm" class="container" style="display:none">
+    <h3>Post New Internship</h3>
+    <form id="internshipForm">
+      <label>Internship Title:</label>
+      <input type="text" name="title" required>
+
+      <label>Description:</label>
+      <textarea name="description" rows="3"></textarea>
+
+      <label>Required Skills (comma separated):</label>
+      <input type="text" name="skills">
+
+      <label>Duration (weeks):</label>
+      <input type="number" name="duration">
+
+      <label>Type:</label>
+      <select name="type">
+        <option>Paid</option>
+        <option>Unpaid</option>
+        <option>Any</option>
+      </select>
+
+      <label>Eligibility (Branches, Years, CGPA):</label>
+      <textarea name="eligibility"></textarea>
+
+      <label>Number of Positions:</label>
+      <input type="number" name="positions">
+
+      <button type="button" class="submit-btn" onclick="previewRequirement()">Preview</button>
+    </form>
+
+    <div id="previewRequirementDiv" class="preview-box" style="display:none"></div>
+  </div>
+</div>
+
+<script>
+let internships = [];
+let notifications = [];
+let employees = [];
+
+function showSection(section){
+  document.querySelectorAll('.main > div').forEach(div=>div.style.display='none');
+  document.getElementById(section).style.display='block';
+  document.querySelectorAll('.sidebar button').forEach(btn=>btn.classList.remove('active'));
+  event.target.classList.add('active');
+  if(section==='submittedForms') renderInternships();
+  if(section==='notifications') renderNotifications();
+  if(section==='employeeDetails') renderEmployees();
+}
+
+// --- Logout ---
+function logout(){ alert('Logging out...'); window.location.href='index.html'; }
+
+// --- Requirement Form Preview & Post ---
+function previewRequirement(){
+  const form = document.getElementById('internshipForm');
+  const data = new FormData(form);
+  let html = '<h4>Preview:</h4>';
+  data.forEach((val,key)=> html += `<p><b>${key}:</b> ${val}</p>`);
+  html += '<button class="box-btn submit-btn" onclick="postRequirement()">Post Internship</button>';
+  document.getElementById('previewRequirementDiv').innerHTML = html;
+  document.getElementById('previewRequirementDiv').style.display='block';
+}
+
+function postRequirement(){
+  const form = document.getElementById('internshipForm');
+  const data = new FormData(form);
+  const internship = {};
+  data.forEach((val,key)=> internship[key]=val);
+  internship.status = 'active';
+  internship.count = 0;
+  internships.push(internship);
+  notifications.push(`New internship posted: ${internship.title}`);
+  form.reset();
+  document.getElementById('previewRequirementDiv').style.display='none';
+  renderInternships();
+  alert('Internship posted successfully!');
+}
+
+// --- Render Functions ---
+function renderInternships(){
+  const tbody = document.getElementById('internshipTable');
+  tbody.innerHTML = '';
+  internships.forEach((i,index)=>{
+    const tr = document.createElement('tr');
+    tr.className = i.status==='paused'?'paused':'';
+    tr.innerHTML = `
+      <td>${i.title}</td>
+      <td>${i.count}</td>
+      <td>${i.status.toUpperCase()}</td>
+      <td>
+        <button class="box-btn pause-btn" onclick="togglePause(${index})">${i.status==='active'?'Pause':'Resume'}</button>
+        <button class="box-btn delete-btn" onclick="deleteInternship(${index})">Delete</button>
+      </td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+function togglePause(index){
+  internships[index].status = internships[index].status==='active'?'paused':'active';
+  notifications.push(`${internships[index].title} status changed to ${internships[index].status.toUpperCase()}`);
+  renderInternships();
+}
+
+function deleteInternship(index){
+  notifications.push(`Internship deleted: ${internships[index].title}`);
+  internships.splice(index,1);
+  renderInternships();
+}
+
+function clearAllInternships(){ internships=[]; renderInternships(); }
+
+// --- Notifications ---
+function renderNotifications(){
+  const div = document.getElementById('notificationList');
+  div.innerHTML = '';
+  notifications.forEach((n,i)=>{
+    const item = document.createElement('div');
+    item.className='notification-item';
+    item.innerHTML = `${n} <button class="box-btn delete-btn" onclick="deleteNotification(${i})">Delete</button>`;
+    div.appendChild(item);
+  });
+}
+
+function deleteNotification(index){ notifications.splice(index,1); renderNotifications(); }
+function clearAllNotifications(){ notifications=[]; renderNotifications(); }
+
+// --- Employees / CV ---
+function renderEmployees(){
+  const div = document.getElementById('employeeList');
+  div.innerHTML = '';
+  employees.forEach((e,i)=>{
+    const item = document.createElement('div');
+    item.className='notification-item';
+    item.innerHTML = `<b>${e.name}</b> applied for <b>${e.internship}</b> 
+                      <button class="box-btn delete-btn" onclick="deleteEmployee(${i})">Delete</button>`;
+    div.appendChild(item);
+  });
+}
+
+function deleteEmployee(index){ employees.splice(index,1); renderEmployees(); }
+function clearAllEmployees(){ employees=[]; renderEmployees(); }
+
+// --- For Demo: Simulate Employee submission ---
+function addDemoEmployee(name, internship){
+  employees.push({name, internship});
+  notifications.push(`${name} submitted form for ${internship}`);
+  renderEmployees();
+  renderNotifications();
+}
+
+// Demo Data
+addDemoEmployee("Alice","Frontend Developer");
+addDemoEmployee("Bob","Data Science Intern");
+
+</script>
+</body>
+</html>

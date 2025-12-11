@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Company Registration & Preview</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(to right, #74ebd5, #ACB6E5);
+      margin: 0;
+      padding: 20px;
+    }
+    .container {
+      max-width: 700px;
+      margin: auto;
+      background: #fff;
+      padding: 25px;
+      border-radius: 15px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+    }
+    h2 { text-align:center; color:#333; margin-bottom:20px; }
+    label { display:block; margin-top:15px; font-weight:bold; color:#444; }
+    input, select, textarea { width:100%; padding:10px; margin-top:6px; border:1px solid #ccc; border-radius:8px; }
+    input:focus, select:focus, textarea:focus { border-color:#007bff; outline:none; }
+    button { margin-top:20px; padding:12px 20px; border:none; border-radius:8px; background:#007bff; color:white; cursor:pointer; font-size:16px; }
+    button:hover { background:#0056b3; }
+    .preview-section { display:none; margin-top:20px; padding:20px; border-radius:15px; background:#f0f8ff; box-shadow:0 4px 15px rgba(0,0,0,0.1); }
+    .preview-section img { max-width:150px; max-height:150px; margin-bottom:15px; border-radius:10px; border:2px solid #007bff; }
+    .preview-section h3 { margin-bottom:10px; color:#333; }
+    .preview-section p { margin:5px 0; color:#555; }
+    .preview-section a { color:#007bff; text-decoration:none; }
+    .preview-buttons { margin-top:20px; }
+    .preview-buttons button { margin-right:10px; }
+  </style>
+</head>
+<body>
+<div class="container" id="formPage">
+  <h2>Company Registration Form</h2>
+  <form id="companyForm">
+    <label>Company Name:</label>
+    <input type="text" name="companyName" required>
+
+    <label>Industry:</label>
+    <input type="text" name="industry" required>
+
+    <label>Website URL:</label>
+    <input type="url" name="website">
+
+    <label>Headquarters:</label>
+    <input type="text" name="headquarter" required>
+
+    <label>Founded Year:</label>
+    <input type="number" name="foundedYear" min="1800" max="2099" step="1" required>
+
+    <label>Email Address:</label>
+    <input type="email" name="email" required>
+
+    <label>Phone Number:</label>
+    <input type="tel" name="phone" required>
+
+    <label>Alternate Phone Number:</label>
+    <input type="tel" name="altPhone">
+
+    <label>Company Description:</label>
+    <textarea name="description" maxlength="1000"></textarea>
+
+    <label>Upload Company Logo:</label>
+    <input type="file" name="logo" accept="image/*" id="logoUpload">
+
+    <label>Upload Company Document:</label>
+    <input type="file" name="document" accept=".pdf,.doc,.docx" id="docUpload">
+
+    <label>
+      <input type="checkbox" name="terms" required>
+      I agree to the Terms and Conditions
+    </label>
+
+    <label>Username:</label>
+    <input type="text" name="username" required>
+
+    <label>Password:</label>
+    <input type="password" name="password" required>
+
+    <button type="button" onclick="previewCompany()">Preview</button>
+  </form>
+</div>
+
+<div class="container preview-section" id="previewPage">
+  <h2>Preview Page</h2>
+  <div id="preview"></div>
+</div>
+
+<script>
+function previewCompany(){
+  const form = document.getElementById("companyForm");
+  const data = new FormData(form);
+  const obj = {};
+  data.forEach((val,key)=> obj[key]=val);
+
+  const previewDiv = document.getElementById("preview");
+  previewDiv.innerHTML = "";
+
+  // Logo Preview
+  const logoFile = document.getElementById("logoUpload").files[0];
+  if(logoFile){
+    const logoImg = document.createElement("img");
+    logoImg.src = URL.createObjectURL(logoFile);
+    previewDiv.appendChild(logoImg);
+  }
+
+  let html = `<h3>${obj.companyName}</h3>`;
+  html += `<p><b>Industry:</b> ${obj.industry}</p>`;
+  html += `<p><b>Website:</b> <a href="${obj.website}" target="_blank">${obj.website}</a></p>`;
+  html += `<p><b>Headquarters:</b> ${obj.headquarter}</p>`;
+  html += `<p><b>Founded Year:</b> ${obj.foundedYear}</p>`;
+  html += `<p><b>Email:</b> ${obj.email}</p>`;
+  html += `<p><b>Phone:</b> ${obj.phone}</p>`;
+  if(obj.altPhone) html += `<p><b>Alternate Phone:</b> ${obj.altPhone}</p>`;
+  html += `<p><b>Description:</b> ${obj.description}</p>`;
+
+  // Document Preview
+  const docFile = document.getElementById("docUpload").files[0];
+  if(docFile){
+    const docLink = document.createElement("a");
+    docLink.href = URL.createObjectURL(docFile);
+    docLink.target = "_blank";
+    docLink.innerText = `View Document: ${docFile.name}`;
+    previewDiv.appendChild(docLink);
+    previewDiv.appendChild(document.createElement("br"));
+  }
+
+  html += `<p><b>Username:</b> ${obj.username}</p>`;
+  html += `<p><b>Agreed to Terms:</b> ${obj.terms ? "Yes" : "No"}</p>`;
+
+  previewDiv.innerHTML += html;
+
+  // Add buttons
+  const btnDiv = document.createElement("div");
+  btnDiv.className = "preview-buttons";
+  const submitBtn = document.createElement("button");
+  submitBtn.innerText = "Submit";
+  submitBtn.onclick = submitCompany;
+  const editBtn = document.createElement("button");
+  editBtn.innerText = "Edit";
+  editBtn.onclick = editCompany;
+  btnDiv.appendChild(submitBtn);
+  btnDiv.appendChild(editBtn);
+  previewDiv.appendChild(btnDiv);
+
+  document.getElementById("formPage").style.display="none";
+  document.getElementById("previewPage").style.display="block";
+}
+
+function editCompany(){
+  document.getElementById("formPage").style.display="block";
+  document.getElementById("previewPage").style.display="none";
+}
+
+function submitCompany(){
+  alert("Company form submitted successfully! ✅");
+  window.location.href="index.html";
+}
+</script>
+
+<script>
+// ---------- Convert file to Base64 ----------
+function fileToBase64(file) {
+  return new Promise((resolve, reject) => {
+    if (!file) return resolve(null);
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = error => reject(error);
+    reader.readAsDataURL(file);
+  });
+}
+
+// ---------- Preview Company Form ----------
+async function previewCompany() {
+  const form = document.getElementById("companyForm");
+  const data = new FormData(form);
+  const obj = {};
+
+  // Collect form fields
+  data.forEach((val, key) => {
+    obj[key] = val;
+  });
+
+  // Convert logo and document to Base64
+  const logoFile = document.getElementById("logoUpload").files[0];
+  const docFile = document.getElementById("docUpload").files[0];
+  obj.logoFile = await fileToBase64(logoFile);
+  obj.docFile = await fileToBase64(docFile);
+
+  // Build preview
+  const previewDiv = document.getElementById("preview");
+  previewDiv.innerHTML = "";
+
+  if (obj.logoFile) {
+    const logoImg = document.createElement("img");
+    logoImg.src = obj.logoFile;
+    previewDiv.appendChild(logoImg);
+  }
+
+  let html = `<h3>${obj.companyName}</h3>`;
+  html += `<p><b>Industry:</b> ${obj.industry}</p>`;
+  html += `<p><b>Website:</b> <a href="${obj.website}" target="_blank">${obj.website}</a></p>`;
+  html += `<p><b>Headquarters:</b> ${obj.headquarter}</p>`;
+  html += `<p><b>Founded Year:</b> ${obj.foundedYear}</p>`;
+  html += `<p><b>Email:</b> ${obj.email}</p>`;
+  html += `<p><b>Phone:</b> ${obj.phone}</p>`;
+  if(obj.altPhone) html += `<p><b>Alternate Phone:</b> ${obj.altPhone}</p>`;
+  html += `<p><b>Description:</b> ${obj.description}</p>`;
+  if (obj.docFile) html += `<p><b>Document Uploaded</b></p>`;
+  html += `<p><b>Username:</b> ${obj.username}</p>`;
+  html += `<p><b>Agreed to Terms:</b> ${obj.terms ? "Yes" : "No"}</p>`;
+
+  previewDiv.innerHTML += html;
+
+  // Add buttons
+  const btnDiv = document.createElement("div");
+  btnDiv.className = "preview-buttons";
+  const submitBtn = document.createElement("button");
+  submitBtn.innerText = "Submit";
+  submitBtn.onclick = () => submitCompany(obj);
+  const editBtn = document.createElement("button");
+  editBtn.innerText = "Edit";
+  editBtn.onclick = editCompany;
+  btnDiv.appendChild(submitBtn);
+  btnDiv.appendChild(editBtn);
+  previewDiv.appendChild(btnDiv);
+
+  document.getElementById("formPage").style.display="none";
+  document.getElementById("previewPage").style.display="block";
+}
+
+// ---------- Back to Edit ----------
+function editCompany(){
+  document.getElementById("formPage").style.display="block";
+  document.getElementById("previewPage").style.display="none";
+}
+
+// ---------- Submit Company Form ----------
+function submitCompany(obj) {
+  fetch("http://127.0.0.1:5000/companies/register", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(obj)
+  })
+  .then(res => res.json())
+  .then(data => {
+    if(data.error) throw new Error(data.error);
+    alert(data.message || "Company registered ✅");
+    window.location.href = "index.html"; // redirect after success
+  })
+  .catch(err => {
+    console.error("Error:", err);
+    alert("Error submitting form ❌\n" + err.message);
+  });
+}
+</script>
+
+</body>
+</html>
