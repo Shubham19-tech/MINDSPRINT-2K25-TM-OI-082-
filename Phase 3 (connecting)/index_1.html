@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>AI Interview System – Dashboard</title>
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+      background: #f4f4f4;
+    }
+
+    h1, h2 {
+      color: #222;
+    }
+
+    .status {
+      padding: 6px 12px;
+      border-radius: 6px;
+      color: white;
+      font-weight: bold;
+    }
+
+    .ok {
+      background: #28a745;
+    }
+
+    .bad {
+      background: #dc3545;
+    }
+
+    .warn {
+      background: #fd7e14;
+    }
+
+    table {
+      width: 100%;
+      margin-bottom: 20px;
+      background: white;
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    td {
+      padding: 10px;
+      border: 1px solid #ccc;
+    }
+
+    button {
+      padding: 10px 15px;
+      margin: 5px;
+      background: #007bff;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+
+    button:hover {
+      background: #0056b3;
+    }
+
+    #cam {
+      width: 380px;
+      border: 2px solid #444;
+      border-radius: 8px;
+      margin-bottom: 10px;
+    }
+
+    #log {
+      background: #000;
+      color: #0f0;
+      padding: 10px;
+      height: 200px;
+      overflow-y: auto;
+      font-family: monospace;
+      border-radius: 8px;
+    }
+  </style>
+</head>
+
+<body>
+
+<h1>AI Interview System – Connectivity Check Panel</h1>
+
+<!-- STATUS BOARD -->
+<h2>System Status</h2>
+
+<table>
+  <tr>
+    <td>Backend Server</td>
+    <td><span id="backendStatus" class="status bad">Not Connected</span></td>
+  </tr>
+  <tr>
+    <td>WebSocket</td>
+    <td><span id="wsStatus" class="status bad">Not Connected</span></td>
+  </tr>
+  <tr>
+    <td>Camera</td>
+    <td><span id="camStatus" class="status bad">Not Tested</span></td>
+  </tr>
+  <tr>
+    <td>Microphone</td>
+    <td><span id="micStatus" class="status bad">Not Tested</span></td>
+  </tr>
+  <tr>
+    <td>Ollama LLaMA</td>
+    <td><span id="llamaStatus" class="status bad">Not Tested</span></td>
+  </tr>
+  <tr>
+    <td>Whisper STT</td>
+    <td><span id="whisperStatus" class="status bad">Not Tested</span></td>
+  </tr>
+  <tr>
+    <td>TTS Audio</td>
+    <td><span id="ttsStatus" class="status bad">Not Tested</span></td>
+  </tr>
+</table>
+
+<!-- SYSTEM TEST BUTTONS -->
+<h2>Connectivity Tools</h2>
+
+<button onclick="testBackend()">Test Backend</button>
+<button onclick="testWS()">Test WebSocket</button>
+<button onclick="testCamera()">Test Camera</button>
+<button onclick="testMic()">Test Microphone</button>
+<button onclick="testLLaMA()">Test LLaMA</button>
+<button onclick="testTTS()">Test TTS</button>
+
+<hr>
+
+<!-- INTERVIEW PANEL -->
+<h2>AI Interview Panel</h2>
+
+<video id="cam" autoplay playsinline muted></video><br>
+
+<button id="connect">Connect WS</button>
+<button id="start" disabled>Start Recording</button>
+<button id="stop" disabled>Stop & Send</button>
+<button id="end" disabled>End Session</button>
+
+<p><b>Transcript:</b> <span id="trans"></span></p>
+<p><b>LLM Response:</b> <span id="llm"></span></p>
+
+<hr>
+
+<!-- LOG WINDOW -->
+<h2>Debug Log</h2>
+<div id="log"></div>
+
+<script>
+let ws, rec, stream;
+
+// Utility
+function log(msg) {
+  const logBox = document.getElementById("log");
+  logBox.innerHTML += msg + "<br>";
+  logBox.scrollTop = logBox.scrollHeight;
+}
+
+function setStatus(id, state) {
+  const el = document.getElementById(id);
+  el.className = "status " + (state ? "ok" : "bad");
+  el.innerText = state ? "OK" : "Failed";
+}
+
+
+// ---------------- BACKEND TEST ----------------
+async function testBackend() {
+  try {
+    const res = await fetch("/");
+    if (res.status === 200) {
+      setStatus("backendStatus", true);
+      log("Backend OK ✔");
+    }
+  } catch {
+    setStatus("backendStatus", false);
+    log("Backend FAILED ❌");
+  }
+}
+
+
+// ---------------- WEBSOCKET TEST ----------------
+function testWS() {
+  const socket = new WebSocket("ws://localhost:8000/ws/interview");
+  socket.onopen = () => {
+    setStatus("wsStatus", true);
+    log("WS Connected ✔");
+    socket.close();
+  };
+  socket.onerror = () => {
+    setStatus("wsStatus", false);
+    log("WS Connection FAILED ❌");
+  };
+}
+
+
+// ---------------- CAMERA TEST ----------------
+async function testCamera() {
+  try {
+    stream = await navigator.mediaDevices.getUserMedia({video:true});
+    document.getElementById("cam").srcObject = stream;
+    setStatus("camStatus", true);
+    log("Camera OK ✔");
+  } catch {
+    setStatus("camStatus", false);
+    log("Camera FAILED ❌");
+  }
+}
+
+
+// ---------------- MICROPHONE TEST ----------------
+async function testMic() {
+  try {
+    await navigator.mediaDevices.getUserMedia({audio:true});
+    setStatus("micStatus", true);
+    log("Microphone OK ✔");
+  } catch {
+    setStatus("micStatus", false);
+    log("Microphone FAILED ❌");
+  }
+}
+
+
+// ---------------- LLaMA TEST ----------------
+async function testLLaMA() {
+  try {
+    const r = await fetch("/test-llama");
+    const data = await r.json();
+
+    if (data.response) {
+      log("LLaMA says: " + data.response);
+      setStatus("llamaStatus", true);
+    } else {
+      setStatus("llamaStatus", false);
+      log("LLaMA Test FAILED ❌");
+    }
+  } catch {
+    setStatus("llamaStatus", false);
+    log("Could not contact LLaMA ❌");
+  }
+}
+
+
+// ---------------- TTS TEST ----------------
+function testTTS() {
+  let a = new Audio("data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAQB8AAIA+AAACABAAZGF0YQAAAAA=");
+  a.play().then(() => {
+    setStatus("ttsStatus", true);
+    log("TTS Playback OK ✔");
+  }).catch(() => {
+    setStatus("ttsStatus", false);
+    log("TTS Playback FAILED ❌");
+  });
+}
+
+
+// ---------------- INTERVIEW WEBSOCKET ----------------
+document.getElementById("connect").onclick = async () => {
+  stream = await navigator.mediaDevices.getUserMedia({video:true, audio:true});
+  document.getElementById("cam").srcObject = stream;
+
+  ws = new WebSocket("ws://127.0.0.1:8000/ws/interview");
+
+
+  ws.onopen = () => {
+    setStatus("wsStatus", true);
+    document.getElementById("start").disabled = false;
+    document.getElementById("end").disabled = false;
+    log("Interview WS Connected.");
+  };
+
+  ws.onmessage = (e) => {
+    const msg = JSON.parse(e.data);
+
+    if (msg.type === "transcript") {
+      document.getElementById("trans").innerText = msg.text;
+      setStatus("whisperStatus", true);
+      log("Transcript received ✔");
+    }
+
+    if (msg.type === "llm") {
+      document.getElementById("llm").innerText = msg.text;
+      setStatus("llamaStatus", true);
+      log("LLM response received ✔");
+
+      if (msg.tts) {
+        let audio = new Audio("data:audio/wav;base64," + msg.tts);
+        audio.play();
+        setStatus("ttsStatus", true);
+        log("TTS audio played ✔");
+      }
+    }
+  };
+};
+
+
+// ---------------- RECORDING ----------------
+document.getElementById("start").onclick = () => {
+  const audioStream = new MediaStream(stream.getAudioTracks());
+  rec = new MediaRecorder(audioStream);
+
+  rec.ondataavailable = e => {
+    const reader = new FileReader();
+    reader.onload = () => {
+      let b64 = reader.result.split(",")[1];
+      ws.send(JSON.stringify({type:"audio_chunk", data:b64}));
+    };
+    reader.readAsDataURL(e.data);
+  };
+
+  rec.start(800);
+  log("Recording started…");
+  document.getElementById("start").disabled = true;
+  document.getElementById("stop").disabled = false;
+};
+
+
+// ---------------- STOP & SEND ----------------
+document.getElementById("stop").onclick = () => {
+  rec.stop();
+  ws.send(JSON.stringify({type:"finalize"}));
+  log("Recording sent for processing ✔");
+
+  document.getElementById("start").disabled = false;
+  document.getElementById("stop").disabled = true;
+};
+
+
+// ---------------- END SESSION ----------------
+document.getElementById("end").onclick = () => {
+  ws.send(JSON.stringify({type:"end_session"}));
+  log("Session ended ✔");
+};
+
+</script>
+
+</body>
+</html>
